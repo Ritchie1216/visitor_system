@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor and Owner Information</title>
+    <style>
+        #info {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Visitor and Owner Information</h2>
+    <div id="info">Loading...</div>
+    <div id="details"></div>
+
+    <script>
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Fetch visitor code from the query string
+        const visitorCode = getQueryParam('visitor_code');
+
+        // Send the visitor code to the server for validation and information retrieval
+        fetch('validate.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ visitor_code: visitorCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const infoDiv = document.getElementById('info');
+            const detailsDiv = document.getElementById('details');
+
+            if (data.status === 'success') {
+                // Display the visitor and owner details
+                detailsDiv.innerHTML = `
+                    <p>Visitor Code: ${visitorCode}</p>
+                    <p>Visitor Name: ${data.visitor.name}</p>
+                    <p>Owner Name: ${data.owner.owner_name}</p>
+                    <p>Access Status: Valid</p>
+                `;
+                infoDiv.innerText = 'QR Code Validated Successfully!';
+            } else {
+                infoDiv.innerText = data.message;
+                detailsDiv.innerHTML = ''; // Clear details on error
+            }
+
+            // Set a timer to clear the message and details after 3 seconds
+            setTimeout(() => {
+                infoDiv.innerText = ''; // Clear the message
+                detailsDiv.innerHTML = ''; // Clear the details
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('info').innerText = 'Error loading data. Redirecting...';
+            // Redirect back to the QR code reader page after 3 seconds
+            setTimeout(() => {
+                window.location.href = 'QRCodeVerify.php'; // Redirect to QR code scanner page
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
