@@ -22,6 +22,7 @@ $result = $Visitor->getVisitors($owner_id);
     <title>Visitor Management</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         .dashboard-wrapper {
@@ -87,6 +88,8 @@ $result = $Visitor->getVisitors($owner_id);
             border-radius: 8px;
             transition: all 0.3s ease;
             margin: 0 5px;
+            width: 120px;
+            text-align: center;
         }
 
         .btn-action:hover {
@@ -202,6 +205,112 @@ $result = $Visitor->getVisitors($owner_id);
         .visitor-initial[data-initial="Z"] {
             background: linear-gradient(135deg, #00BCD4 0%, #03A9F4 100%);
         }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .swal2-popup {
+            border-radius: 15px !important;
+            padding: 2em !important;
+        }
+
+        .swal2-title {
+            color: #4e73df !important;
+            font-size: 1.5em !important;
+        }
+
+        .swal2-content {
+            font-size: 1.1em !important;
+        }
+
+        .swal2-confirm {
+            background: linear-gradient(135deg, #d33 0%, #ff4444 100%) !important;
+            border-radius: 8px !important;
+            padding: 12px 25px !important;
+        }
+
+        .swal2-cancel {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%) !important;
+            border-radius: 8px !important;
+            padding: 12px 25px !important;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -30px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes fadeOutUp {
+            from {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+            to {
+                opacity: 0;
+                transform: translate3d(0, -30px, 0);
+            }
+        }
+
+        .btn-action i {
+            margin-right: 8px !important;
+        }
+
+        .table th:nth-child(3),
+        .table th:nth-child(4) {
+            width: 140px;
+        }
+
+        .alert-popup {
+            padding: 2em !important;
+            border-radius: 20px !important;
+            background: rgba(255, 255, 255, 0.98) !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+        }
+
+        .alert-title {
+            font-size: 2.5em !important;
+            margin-bottom: 0.3em !important;
+        }
+
+        .alert-title i {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.2em;
+        }
+
+        .alert-message {
+            color: #495057;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin: 0.5em 0;
+        }
+
+        .alert-content {
+            padding: 1em 0;
+        }
+
+        .alert-button {
+            background: linear-gradient(45deg, #4e73df, #224abe) !important;
+            border: none !important;
+            padding: 12px 30px !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .swal2-timer-progress-bar {
+            background: linear-gradient(to right, #28a745, #20c997) !important;
+            height: 3px !important;
+        }
     </style>
 </head>
 <body>
@@ -269,12 +378,18 @@ $result = $Visitor->getVisitors($owner_id);
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="update_visitor_date.php?visitor_id=<?php echo htmlspecialchars($row['id']); ?>" 
-                                           class="btn btn-info btn-action">
-                                            <i class="fas fa-edit me-2"></i>Edit
-                                    </a>
-                                </td>
-                            </tr>
+                                        <div class="btn-group" role="group">
+                                            <a href="update_visitor_date.php?visitor_id=<?php echo htmlspecialchars($row['id']); ?>" 
+                                               class="btn btn-info btn-action">
+                                                <i class="fas fa-edit me-2"></i>Edit
+                                            </a>
+                                            <button class="btn btn-danger btn-action" 
+                                                    onclick="confirmDelete(<?php echo htmlspecialchars($row['id']); ?>)">
+                                                <i class="fas fa-trash me-2"></i>Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
@@ -320,6 +435,88 @@ document.addEventListener('DOMContentLoaded', function() {
     tableRows.forEach((row, index) => {
         row.style.animationDelay = `${index * 0.1}s`;
     });
+});
+
+// 添加删除确认函数
+function confirmDelete(visitorId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This visitor will be permanently deleted!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        customClass: {
+            popup: 'animated fadeInDown faster',
+            title: 'text-danger'
+        },
+        showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 显示加载状态
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // 执行删除
+            window.location.href = `delete_visitor.php?visitor_id=${visitorId}`;
+        }
+    });
+}
+
+// 检查URL参数显示操作结果
+window.addEventListener('load', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    const error = urlParams.get('error');
+    
+    if (msg) {
+        Swal.fire({
+            title: '<i class="fas fa-check-circle text-success"></i>',
+            html: `<div class="alert-message">${msg}</div>`,
+            icon: 'success',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'animated fadeInDown faster alert-popup',
+                title: 'alert-title',
+                htmlContainer: 'alert-content'
+            },
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown animate__faster'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp animate__faster'
+            }
+        });
+    } else if (error) {
+        Swal.fire({
+            title: '<i class="fas fa-exclamation-circle text-danger"></i>',
+            html: `<div class="alert-message">${error}</div>`,
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                popup: 'animated fadeInDown faster alert-popup',
+                title: 'alert-title',
+                htmlContainer: 'alert-content',
+                confirmButton: 'alert-button'
+            }
+        });
+    }
 });
 </script>
 

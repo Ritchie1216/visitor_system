@@ -26,6 +26,19 @@ class VisitorController{
     }
 
     public function ApplyVisitor($name, $IC, $email, $phone, $visitor_code, $visit_date, $status, $owner_id, $valid_days){
+        // 首先检查同一天是否已经有访客
+        $check_stmt = $this->conn->prepare("SELECT COUNT(*) as count FROM visitors WHERE owner_id = ? AND visit_date = ?");
+        $check_stmt->bind_param("is", $owner_id, $visit_date);
+        $check_stmt->execute();
+        $result = $check_stmt->get_result();
+        $row = $result->fetch_assoc();
+        $check_stmt->close();
+
+        if ($row['count'] > 0) {
+            // 如果该日期已有访客预约
+            return 'duplicate_date';
+        }
+
         // 设置二维码过期日期
         $expiration_time = strtotime($visit_date . ' +' . $valid_days . ' days');
 
@@ -94,6 +107,9 @@ class VisitorController{
             // 发送电子邮件包含 QR Code
             // $this->sendEmailWithQRCode($email, $name, $filePath);
         }
+
+        // 如果成功添加访客
+        return 'success';
     }
 
 
@@ -322,6 +338,33 @@ class VisitorController{
 
         } catch (Exception $e) {
             error_log("Error updating visitor: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function DeleteVisitor($visitor_id) {
+        try {
+            // 首先获取QR码文件路径
+            $stmt = $this->conn->prepare("SELECT qr_code FROM visitors WHERE id = ?");
+            $stmt->bind_param("i", $visitor_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $visitor = $result->fetch_assoc();
+            
+            // 如果存在QR码文件，删除它
+            if ($visitor && file_exists($visitor['qr_code'])) {
+                unlink($visitor['qr_code']);
+            }
+
+            // 删除访客记录
+            $stmt = $this->conn->prepare("DELETE FROM visitors WHERE id = ?");
+            $stmt->bind_param("i", $visitor_id);
+            $success = $stmt->execute();
+            $stmt->close();
+            
+            return $success;
+        } catch (Exception $e) {
+            error_log("Error deleting visitor: " . $e->getMessage());
             return false;
         }
     }

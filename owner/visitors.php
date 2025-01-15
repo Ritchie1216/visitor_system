@@ -12,18 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $owner_id = $_SESSION['owner_id'];
 
     $visitor_code = $name . '_' . date('Ymd', strtotime($visit_date));
-
     $status = 'approved';
 
     $visitorManagement = new VisitorController();
+    $result = $visitorManagement->ApplyVisitor($name, $IC, $email, $phone, $visitor_code, $visit_date, $status, $owner_id, $valid_days);
 
-    if ($visitorManagement->ApplyVisitor($name, $IC, $email, $phone, $visitor_code, $visit_date, $status, $owner_id, $valid_days)) {
+    if ($result === 'success') {
         $success = true;
-    }else{
+        $message = "Visitor has been added successfully!";
+    } else if ($result === 'duplicate_date') {
         $success = false;
+        $error = "You already have a visitor scheduled for " . date('d M Y', strtotime($visit_date)) . ". Please choose a different date.";
     }
-
-    //$sucess = '';
 }
 
 
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <html>
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .visitor-wrapper {
             background: #f8f9fc;
@@ -131,6 +132,52 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             margin-bottom: 20px;
             font-size: 1.1rem;
             font-weight: 600;
+        }
+
+        .swal2-popup {
+            border-radius: 15px !important;
+            padding: 2em !important;
+        }
+
+        .swal2-title {
+            color: #4e73df !important;
+            font-size: 1.5em !important;
+        }
+
+        .swal2-content {
+            font-size: 1.1em !important;
+        }
+
+        .swal2-confirm {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%) !important;
+            border-radius: 8px !important;
+            padding: 12px 25px !important;
+        }
+
+        .swal2-timer-progress-bar {
+            background: linear-gradient(to right, #4e73df, #224abe) !important;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -30px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        @keyframes fadeOutUp {
+            from {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+            to {
+                opacity: 0;
+                transform: translate3d(0, -30px, 0);
+            }
         }
     </style>
 </head>
@@ -247,6 +294,48 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             setTimeout(() => alertMessage.remove(), 150);
         }, 3000);
     }
+
+    <?php if (isset($error)): ?>
+        Swal.fire({
+            title: 'Oops!',
+            text: '<?php echo $error; ?>',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            customClass: {
+                popup: 'animated fadeInDown faster',
+                title: 'text-danger'
+            },
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            }
+        });
+    <?php endif; ?>
+
+    <?php if (isset($success) && $success): ?>
+        Swal.fire({
+            title: 'Success!',
+            text: 'Visitor has been added successfully!',
+            icon: 'success',
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            customClass: {
+                popup: 'animated fadeInDown faster'
+            }
+        }).then(() => {
+            window.location.href = 'dashboard.php';
+        });
+    <?php endif; ?>
+
+    // 添加日期选择限制
+    document.addEventListener('DOMContentLoaded', function() {
+        const visitDateInput = document.getElementById('visit_date');
+        const today = new Date().toISOString().split('T')[0];
+        visitDateInput.min = today;
+    });
     </script>
 </body>
 </html>

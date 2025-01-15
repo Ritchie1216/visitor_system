@@ -49,17 +49,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             );
 
             if ($result) {
-                $success = true;
-                // Redirect after successful update
-                header("Location: dashboard.php?success=1");
+                header("Location: dashboard.php?msg=Visitor information has been updated successfully!");
                 exit();
             } else {
-                $error = "Failed to update visitor";
+                header("Location: dashboard.php?error=Failed to update visitor information");
+                exit();
             }
         }
     } catch (Exception $e) {
-        error_log($e->getMessage());
-        $error = "An error occurred while processing your request";
+        header("Location: dashboard.php?error=" . urlencode($e->getMessage()));
+        exit();
     }
 }
 ?>
