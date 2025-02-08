@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 06, 2025 at 02:08 AM
+-- Generation Time: Feb 08, 2025 at 11:05 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -60,7 +60,12 @@ CREATE TABLE `qr_codes` (
 
 INSERT INTO `qr_codes` (`id`, `visitor_id`, `qr_code`, `generated_at`, `expires_at`) VALUES
 (23, 27, 'chengwei_20241204', '2024-12-04 03:24:13', '2024-12-05 00:00:00'),
-(24, 28, 'lize_20250106', '2025-01-06 01:24:18', '2025-01-07 00:00:00');
+(24, 28, 'lize_20250106', '2025-01-06 01:24:18', '2025-01-07 00:00:00'),
+(28, 33, 'qw_20250125', '2025-01-06 14:17:33', '2025-01-26 00:00:00'),
+(30, 36, 'Chah_20250115', '2025-01-15 09:44:15', '2025-01-22 00:00:00'),
+(31, 44, 'Richie Chah_20250115', '2025-01-15 09:56:54', '2025-01-26 00:00:00'),
+(32, 47, 'sy_20250116', '2025-01-15 09:58:38', '2025-01-18 00:00:00'),
+(36, 51, 'Richie Chah_20250130', '2025-01-15 10:15:17', '2025-02-02 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -82,7 +87,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `unit`, `phone`) VALUES
-(9, 'edmond', 'edmond@gmail.com', '$2y$10$3nNBk81epbZ21tF5B40Vh.2wDC6JAgt5CO1cXb0SQoFHzjt88v3qK', '201', '0115678032');
+(9, 'edmon', 'edmond@gmail.com', '$2y$10$i1eLT083vbbglS.iGMa7ouD4vx9O9kbUXDx/wLbjQpmv6lFsUcbPy', '199', '0115678032'),
+(11, 'Richie Chah', 'ritchie121600@gmail.com', '$2y$10$7CJO6Y4jiN8OofyHCubD6.9igEI4iApfGRTsb6nky9G8JZmQm6Yvi', '201', '0123456789'),
+(12, 'rrrr', 'tfdshd123@gmail.com', '$2y$10$nPKGgq2uxcoaCn5ZolK9meLamrrFUsm7joHdsMuA4cOhDje7eQ8km', '88', '12345678'),
+(13, 'lekhong', 'lekhong121600@gmail.com', '$2y$10$jz.wmRVUM2GFhBToAw5fUuDaCDyLgoDh.yMIkHgfJ8DgLV9Jbg.GS', '11', '(012) 457-8967'),
+(14, 'yizhang and zoe', 'yizhang123@gmail.com', '$2y$10$//Ht8bVHYhAHSnIpXPN/pubrZ5BK.rhoWSUuVPxqbHk2qNmm76lUu', '2', '(123) 456-783');
 
 -- --------------------------------------------------------
 
@@ -110,7 +119,12 @@ CREATE TABLE `visitors` (
 
 INSERT INTO `visitors` (`id`, `name`, `IC`, `email`, `phone`, `visitor_code`, `qr_code`, `visit_date`, `status`, `owner_id`, `valid_days`) VALUES
 (27, 'chengwei', 2147483647, 'chengwei@gmail.com', '01164533550', 'chengwei_20241204', '../qrcodes/chengwei_20241204.png', '2024-12-04', 'approved', NULL, 1),
-(28, 'lize', 2147483647, 'lize@gmail.com', '0115678032', 'lize_20250106', '../qrcodes/lize_20250106.png', '2025-01-06', 'approved', NULL, 1);
+(28, 'lize', 2147483647, 'lize@gmail.com', '0115678032', 'lize_20250106', '../qrcodes/lize_20250106.png', '2025-01-06', 'approved', NULL, 1),
+(33, 'qingwei', 2147483647, 'ritchie121990@gmail.com', '12345678', 'qingwei_20250123', '../qrcodes/qingwei_20250123.png', '2025-01-23', 'approved', 11, 1),
+(36, 'Chah', 2147483647, 'ritchie121600@gmail.com', '(123) 456-7890', 'Chah_20250115', '../qrcodes/Chah_20250115.png', '2025-01-15', 'approved', 11, 5),
+(44, 'Richie ', 2147483647, 'ritchie121600@gmail.com', '(789) 954-5665', 'Richie _20250115', '../qrcodes/Richie _20250115.png', '2025-01-15', 'approved', 9, 11),
+(47, 'sy', 2147483647, 'sy21600@gmail.com', '(123) 456-7890', 'sy_20250116', '../qrcodes/sy_20250116.png', '2025-01-16', 'approved', 9, 2),
+(51, 'Richie Chah', 2147483647, 'ritchie121600@gmail.com', '(012) 345-6789', 'Richie Chah_20250130', '../qrcodes/Richie Chah_20250130.png', '2025-01-30', 'approved', 11, 3);
 
 -- --------------------------------------------------------
 
@@ -180,19 +194,19 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `qr_codes`
 --
 ALTER TABLE `qr_codes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `visitors`
 --
 ALTER TABLE `visitors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `visits`
